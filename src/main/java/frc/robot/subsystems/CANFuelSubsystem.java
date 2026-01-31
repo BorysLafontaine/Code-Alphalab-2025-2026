@@ -22,8 +22,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushed);
-    feederRoller = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushed);
+    intakeLauncherRoller = new SparkMax(INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    feederRoller = new SparkMax(FEEDER_MOTOR_ID, MotorType.kBrushless);
 
     // put default values for various fuel operations onto the dashboard
     // all methods in this subsystem pull their values from the dashbaord to allow
@@ -50,9 +50,17 @@ public class CANFuelSubsystem extends SubsystemBase {
     intakeLauncherRoller.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  // A method to set the rollers to values for intaking
+ /*  // A method to set the rollers to values for intaking
   public void intake() {
     feederRoller.setVoltage(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
+    intakeLauncherRoller
+        .setVoltage(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
+  } 
+  */
+
+    // A method to set the rollers to values for intaking
+  public void intake() {
+    feederRoller.set(SmartDashboard.getNumber("Intaking feeder roller value", INTAKING_FEEDER_VOLTAGE));
     intakeLauncherRoller
         .setVoltage(SmartDashboard.getNumber("Intaking intake roller value", INTAKING_INTAKE_VOLTAGE));
   }
@@ -103,5 +111,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("moteur feeder voltage", feederRoller.getOutputCurrent());
+      SmartDashboard.putNumber("moteur intake voltage", intakeLauncherRoller.getOutputCurrent());
   }
 }
