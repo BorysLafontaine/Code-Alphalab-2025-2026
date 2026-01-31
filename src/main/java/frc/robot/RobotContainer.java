@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.FuelConstants.SPIN_UP_SECONDS;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -16,8 +17,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CANFuelSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -35,12 +38,28 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+     public final CANFuelSubsystem FuelIntake = new CANFuelSubsystem();
 
     public RobotContainer() {
         configureBindings();
     }
 
     private void configureBindings() {
+            // While the left bumper on operator controller is held, intake Fuel
+    joystick.leftBumper()
+        .whileTrue(FuelIntake.runEnd(() -> FuelIntake.intake(), () -> FuelIntake.stop()));
+    // While the right bumper on the operator controller is held, spin up for 1
+    // second, then launch fuel. When the button is released, stop.
+    joystick.rightBumper()
+        .whileTrue(FuelIntake.spinUpCommand().withTimeout(SPIN_UP_SECONDS)
+            .andThen(FuelIntake.launchCommand())
+            .finallyDo(() -> FuelIntake.stop()));
+    // While the A button is held on the operator controller, eject fuel back out
+    // the intake
+    joystick.a()
+        .whileTrue(FuelIntake.runEnd(() -> FuelIntake.eject(), () -> FuelIntake.stop()));
+
+       
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
