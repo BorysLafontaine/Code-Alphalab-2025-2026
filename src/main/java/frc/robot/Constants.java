@@ -33,6 +33,7 @@ public final class Constants {
     public static final int INTAKE_LAUNCHER_MOTOR_ID = 51;
 
     // Current limit and nominal voltage for fuel mechanism motors.
+    // Default values 60 60
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 60;
     public static final int LAUNCHER_MOTOR_CURRENT_LIMIT = 60;
 
